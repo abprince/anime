@@ -1,49 +1,40 @@
 const API_BASE = '/api/v2/hianime';
 
-async function fetchData(endpoint) {
+// Shared functions
+window.fetchData = async function(endpoint) {
+  const API_BASE = '/api/v2/hianime';
   try {
     const response = await fetch(`${API_BASE}${endpoint}`);
-    
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    // Some endpoints return 'success', others return 'status'
-    if (data.success === false || (data.status && data.status !== 200)) {
-      throw new Error(data.message || 'API request unsuccessful');
-    }
-    
-    return data;
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
   } catch (error) {
-    console.error('API Error:', error);
-    showErrorToast(error.message);
+    console.error('fetchData error:', error);
     throw error;
   }
-}
+};
 
-function showErrorToast(message) {
-  const toast = document.createElement('div');
-  toast.className = 'error-toast';
-  toast.textContent = `Error: ${message}`;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 5000);
-}
+window.createAnimeCard = function(anime) {
+  return `
+    <div class="anime-card" data-id="${anime.id}">
+      <img src="${anime.poster}" alt="${anime.name}" loading="lazy">
+      <h3>${anime.name}</h3>
+      <div class="episode-badge">
+        ${anime.episodes?.sub || 0} Sub | ${anime.episodes?.dub || 0} Dub
+      </div>
+    </div>
+  `;
+};
 
-// Add this to your styles.css
-.error-toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ff4444;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 4px;
-  z-index: 1000;
-  animation: fadeIn 0.3s;
-}
+// Error handling
+window.showError = function(message) {
+  const errorEl = document.createElement('div');
+  errorEl.className = 'global-error';
+  errorEl.innerHTML = `
+    <p>${message}</p>
+    <button onclick="this.parentElement.remove()">Dismiss</button>
+  `;
+  document.body.prepend(errorEl);
+};
 
 @keyframes fadeIn {
   from { opacity: 0; }
