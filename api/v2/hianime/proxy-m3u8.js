@@ -1,6 +1,4 @@
 // api/v2/hianime/proxy-m3u8.js
-import { getRawBody } from 'raw-body';
-import { Readable } from 'stream';
 
 export const config = {
   api: {
@@ -12,19 +10,17 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,OPTIONS',
   'Access-Control-Allow-Headers': '*, Accept, Origin, Referer, User-Agent, Range',
-  'Content-Type': 'application/vnd.apple.mpegurl',
 };
 
+// Handle OPTIONS (preflight)
 export default async function handler(req, res) {
-  // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).setHeaders(CORS_HEADERS).end();
     return;
   }
 
   if (req.method !== 'GET') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { url, referer } = req.query;
@@ -37,17 +33,13 @@ export default async function handler(req, res) {
     const targetUrl = decodeURIComponent(url);
     const refererUrl = decodeURIComponent(referer);
 
-    // Fetch the .m3u8 file with realistic headers
     const response = await fetch(targetUrl, {
       headers: {
         'Referer': refererUrl,
         'Origin': new URL(refererUrl).origin,
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': '*/*',
         'Accept-Encoding': 'identity',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-Mode': 'cors',
       },
       redirect: 'follow',
     });
@@ -60,17 +52,15 @@ export default async function handler(req, res) {
       });
     }
 
-    // Set response headers
+    // Forward response headers
     const contentType = response.headers.get('content-type') || 'application/vnd.apple.mpegurl';
     res.status(200);
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    res.setHeader('Cache-Control', 'no-cache');
     Object.assign(CORS_HEADERS, { 'Content-Type': contentType });
     res.setHeaders(CORS_HEADERS);
 
-    // Stream the response back
+    // Stream the response
     const reader = response.body.getReader();
     const pump = () => {
       reader.read().then(({ done, value }) => {
