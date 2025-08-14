@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Show loading state
     document.getElementById('spotlight-slider').innerHTML = '<div class="loading">Loading...</div>';
     
-    // Fetch home data
-    const data = await fetchData('/home');
+    // Fetch home data using the global App object
+    const data = await App.fetchData('/home');
     
-    // Check if data exists - modified to not use optional chaining
+    // Check if data exists
     if (!data || !data.data) {
       throw new Error('Invalid API response structure');
     }
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     spotlightSlider.innerHTML = '';
     if (data.data.spotlightAnimes) {
       data.data.spotlightAnimes.forEach(anime => {
-        spotlightSlider.innerHTML += createAnimeCard(anime);
+        spotlightSlider.innerHTML += App.createAnimeCard(anime);
       });
     }
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     latestEpisodes.innerHTML = '';
     if (data.data.latestEpisodeAnimes) {
       data.data.latestEpisodeAnimes.forEach(anime => {
-        latestEpisodes.innerHTML += createAnimeCard(anime);
+        latestEpisodes.innerHTML += App.createAnimeCard(anime);
       });
     }
 
