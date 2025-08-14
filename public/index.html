@@ -197,6 +197,38 @@
             margin-top: 1rem;
             text-align: center;
         }
+
+        .video-container {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+#video-player {
+  background: #000;
+  aspect-ratio: 16/9;
+}
+
+.episode-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.episode-controls button {
+  background: #d5b3ff;
+  color: #000;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.episode-controls button:hover {
+  background: #c19de8;
+}
     </style>
 </head>
 
@@ -272,6 +304,49 @@ IMPORTANT:
             </a>
         </div>
     </section>
+<!-- Add this below the contributors section -->
+<div class="video-container" style="margin: 2rem 0; width: 100%; max-width: 800px;">
+  <h3>Watch Demo Episode</h3>
+  <video id="video-player" controls style="width: 100%; border-radius: 8px;"></video>
+  <div class="episode-controls" style="margin-top: 1rem;">
+    <button onclick="loadEpisode('steinsgate-3?ep=230', 'hd-1', 'sub')" style="padding: 8px 16px; background: #d5b3ff; border: none; border-radius: 4px; cursor: pointer;">
+      Play Steins;Gate Episode 230
+    </button>
+  </div>
+</div>
+
+
+    <!-- Add these scripts before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  function loadEpisode(episodeId, server, category) {
+    const video = document.getElementById('video-player');
+    
+    fetch(`/api/v2/hianime/episode/sources?animeEpisodeId=${episodeId}&server=${server}&category=${category}`)
+      .then(response => response.json())
+      .then(data => {
+        const hlsUrl = data.data.sources[0].proxiedUrl;
+        
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(hlsUrl);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play();
+          });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = hlsUrl;
+          video.addEventListener('loadedmetadata', function() {
+            video.play();
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load video. Check console for details.');
+      });
+  }
+</script>
 </body>
 
 </html>
