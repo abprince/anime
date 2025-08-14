@@ -7,6 +7,35 @@
   --text: #ffffff;
   --text-secondary: #b3b3b3;
 }
+/* Add these to styles.css */
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.global-error {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4444;
+  color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  z-index: 1000;
+  max-width: 80%;
+}
+
+.global-error button {
+  background: white;
+  color: #ff4444;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+  border-radius: 3px;
+}
 
 * {
   margin: 0;
