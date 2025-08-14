@@ -247,38 +247,55 @@ hianimeRouter.get("/anime/:animeId/next-episode-schedule", async (c) => {
 
 // /api/v2/hianime/proxy-m3u8?url={encodedUrl}&referer={encodedReferer}
 hianimeRouter.get("/proxy-m3u8", async (c) => {
-  const url = decodeURIComponent(c.req.query("url") || "";
+
+  const url = decodeURIComponent(c.req.query("url") || "");
   const referer = decodeURIComponent(c.req.query("referer") || "https://megaplay.buzz");
 
   if (!url) {
     return c.json({ status: 400, error: "Missing URL parameter" }, 400);
   }
 
+  // Cloudflare bypass headers
+  const headers = {
+    'Referer': referer,
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': '*/*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Origin': new URL(referer).origin,
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'cross-site'
+  };
+
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     const response = await fetch(url, {
-      headers: {
-        "Referer": referer,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      },
+      headers,
+      signal: controller.signal
     });
 
+    clearTimeout(timeout);
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch M3U8: ${response.statusText}`);
+      throw new Error(`Origin server responded with ${response.status}`);
     }
 
     const m3u8Content = await response.text();
 
     return c.body(m3u8Content, 200, {
-      "Content-Type": "application/vnd.apple.mpegurl",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+      'Content-Type': 'application/vnd.apple.mpegurl',
+      'Cache-Control': 'public, max-age=3600',
+      'Access-Control-Allow-Origin': '*'
     });
+
   } catch (error) {
+    console.error('Proxy error:', error);
     return c.json(
-      { status: 502, error: "Proxy failed (blocked by origin)" },
-      502,
+      { status: 502, error: `Proxy failed: ${error.message}` },
+      502
     );
   }
 });
-
 export { hianimeRouter };
