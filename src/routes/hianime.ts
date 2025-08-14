@@ -185,28 +185,36 @@ hianimeRouter.get("/episode/servers", async (c) => {
     return c.json({ status: 200, data }, { status: 200 });
 });
 
-// episodeId=steinsgate-3?ep=230
-// /api/v2/hianime/episode/sources?animeEpisodeId={episodeId}?server={server}&category={category (dub or sub)}
+// /api/v2/hianime/episode/sources?animeEpisodeId={episodeId}&server={server}&category={category}
 hianimeRouter.get("/episode/sources", async (c) => {
-    const cacheConfig = c.get("CACHE_CONFIG");
-    const animeEpisodeId = decodeURIComponent(
-        c.req.query("animeEpisodeId") || ""
-    );
-    const server = decodeURIComponent(
-        c.req.query("server") || HiAnime.Servers.VidStreaming
-    ) as HiAnime.AnimeServers;
-    const category = decodeURIComponent(c.req.query("category") || "sub") as
-        | "sub"
-        | "dub"
-        | "raw";
+  const cacheConfig = c.get("CACHE_CONFIG");
+  const animeEpisodeId = decodeURIComponent(c.req.query("animeEpisodeId") || "");
+  const server = decodeURIComponent(c.req.query("server") || HiAnime.Servers.VidStreaming) as HiAnime.AnimeServers;
+  const category = decodeURIComponent(c.req.query("category") || "sub") as "sub" | "dub" | "raw";
 
-    const data = await cache.getOrSet<HiAnime.ScrapedAnimeEpisodesSources>(
-        async () => hianime.getEpisodeSources(animeEpisodeId, server, category),
-        cacheConfig.key,
-        cacheConfig.duration
-    );
+  const data = await cache.getOrSet<HiAnime.ScrapedAnimeEpisodesSources>(
+    async () => {
+      // Fetch original sources
+      const sources = await hianime.getEpisodeSources(animeEpisodeId, server, category);
 
-    return c.json({ status: 200, data }, { status: 200 });
+      // Add proxied URLs for HLS streams
+      if (sources?.sources) {
+        sources.sources = sources.sources.map((source) => ({
+          ...source,
+          // Only proxy HLS streams
+          proxiedUrl: source.type === "hls" 
+            ? `/api/v2/hianime/proxy-m3u8?url=${encodeURIComponent(source.url)}&referer=${encodeURIComponent(sources.headers?.Referer || "https://megaplay.buzz")}`
+            : source.url,
+        }));
+      }
+
+      return sources;
+    },
+    cacheConfig.key,
+    cacheConfig.duration
+  );
+
+  return c.json({ status: 200, data }, { status: 200 });
 });
 
 // /api/v2/hianime/anime/{anime-id}/episodes
