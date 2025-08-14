@@ -7,16 +7,25 @@
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <div class="video-container">
+<div class="player-container">
+  <div class="video-wrapper">
     <video id="video-player" controls></video>
-    <div class="episode-info">
-      <h1 id="episode-title"></h1>
-      <div class="episode-navigation">
-        <button id="prev-episode">Previous</button>
-        <button id="next-episode">Next</button>
-      </div>
-    </div>
   </div>
+  <div class="player-controls">
+    <select id="server-select">
+      <option value="hd-1">HD Server 1</option>
+      <option value="vidstreaming">VidStreaming</option>
+    </select>
+    <select id="category-select">
+      <option value="sub">Sub</option>
+      <option value="dub">Dub</option>
+    </select>
+    <button id="reload-btn">Reload Player</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.3/dist/hls.min.js"></script>
+<script src="/js/player.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="/js/main.js"></script>
