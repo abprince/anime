@@ -1,1 +1,25 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Watch Anime</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="video-container">
+    <video id="video-player" controls></video>
+    <div class="episode-info">
+      <h1 id="episode-title"></h1>
+      <div class="episode-navigation">
+        <button id="prev-episode">Previous</button>
+        <button id="next-episode">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>
