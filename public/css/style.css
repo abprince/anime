@@ -1,31 +1,365 @@
-.video-container {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem;
-  border-radius: 8px;
+/* ===== Base Styles ===== */
+:root {
+  --primary: #d5b3ff;
+  --primary-dark: #8a2be2;
+  --background: #151518;
+  --card-bg: #1e1e24;
+  --text: #ffffff;
+  --text-secondary: #b3b3b3;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* ===== Header Styles ===== */
+header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   backdrop-filter: blur(10px);
 }
 
-#video-player {
-  background: #000;
-  aspect-ratio: 16/9;
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--primary);
 }
 
-.episode-controls {
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+nav a {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  background-color: rgba(213, 179, 255, 0.1);
+}
+
+.search-bar {
+  display: flex;
+  width: 300px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px 0 0 4px;
+  color: white;
+}
+
+.search-bar button {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: black;
+  border: none;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ===== Home Page Styles ===== */
+main {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+section {
+  margin-bottom: 3rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary);
+}
+
+/* Slider Styles */
+.slider {
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background);
 }
 
-.episode-controls button {
-  background: #d5b3ff;
-  color: #000;
-  padding: 8px 16px;
+.slider::-webkit-scrollbar {
+  height: 8px;
+}
+
+.slider::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 4px;
+}
+
+/* Grid Styles */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Anime Card Styles */
+.anime-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.anime-card:hover {
+  transform: translateY(-5px);
+}
+
+.anime-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.anime-card h3 {
+  padding: 0.75rem;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.episode-badge {
+  background-color: var(--primary-dark);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  margin: 0 0.75rem 0.75rem;
+  display: inline-block;
+}
+
+/* Ranking Styles */
+.ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.rank-number {
+  font-weight: bold;
+  color: var(--primary);
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.rank-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 1rem;
+}
+
+.rank-info {
+  flex: 1;
+}
+
+/* ===== Anime Details Page ===== */
+.anime-details {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.anime-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.anime-header img {
+  width: 300px;
+  height: 450px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.anime-info {
+  flex: 1;
+}
+
+.anime-info h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats span {
+  background-color: rgba(213, 179, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+#watch-now {
+  background-color: var(--primary);
+  color: black;
+  padding: 0.75rem 2rem;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+#watch-now:hover {
+  background-color: #c19de8;
+}
+
+.episode-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.episode-item {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.episode-item:hover {
+  background-color: var(--primary-dark);
+  color: white;
+}
+
+/* ===== Watch Page Styles ===== */
+.video-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+#video-player {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  background-color: black;
+  border-radius: 8px;
+}
+
+.episode-info {
+  margin-top: 1.5rem;
+}
+
+.episode-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.episode-navigation button {
+  background-color: var(--primary);
+  color: black;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
   font-weight: bold;
 }
 
-.episode-controls button:hover {
-  background: #c19de8;
+.episode-navigation button:hover {
+  background-color: #c19de8;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .anime-header {
+    flex-direction: column;
+  }
+
+  .anime-header img {
+    width: 100%;
+    height: auto;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .episode-list {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
 }
