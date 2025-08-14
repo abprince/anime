@@ -237,4 +237,40 @@ hianimeRouter.get("/anime/:animeId/next-episode-schedule", async (c) => {
     return c.json({ status: 200, data }, { status: 200 });
 });
 
+// /api/v2/hianime/proxy-m3u8?url={encodedUrl}&referer={encodedReferer}
+hianimeRouter.get("/proxy-m3u8", async (c) => {
+  const url = decodeURIComponent(c.req.query("url") || "";
+  const referer = decodeURIComponent(c.req.query("referer") || "https://megaplay.buzz");
+
+  if (!url) {
+    return c.json({ status: 400, error: "Missing URL parameter" }, 400);
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "Referer": referer,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch M3U8: ${response.statusText}`);
+    }
+
+    const m3u8Content = await response.text();
+
+    return c.body(m3u8Content, 200, {
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+    });
+  } catch (error) {
+    return c.json(
+      { status: 502, error: "Proxy failed (blocked by origin)" },
+      502,
+    );
+  }
+});
+
 export { hianimeRouter };
