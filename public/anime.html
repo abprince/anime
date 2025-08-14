@@ -28,7 +28,41 @@
       <div class="episode-list" id="episode-list"></div>
     </section>
   </main>
+<!-- Replace your watch button with this: -->
+<button id="watch-now">Watch First Episode</button>
 
+<script>
+  document.getElementById('watch-now').addEventListener('click', async function() {
+    const animeId = new URLSearchParams(window.location.search).get('id');
+    
+    try {
+      // Get episodes list
+      const episodesRes = await fetch(`/api/v2/hianime/anime/${animeId}/episodes`);
+      const { data } = await episodesRes.json();
+      
+      if (!data.episodes || data.episodes.length === 0) {
+        throw new Error('No episodes found');
+      }
+      
+      // Get first episode
+      const firstEpisode = data.episodes[0];
+      
+      // Get available servers
+      const serversRes = await fetch(`/api/v2/hianime/episode/servers?animeEpisodeId=${firstEpisode.episodeId}`);
+      const serversData = await serversRes.json();
+      
+      // Determine default category
+      const defaultCategory = serversData.data.sub.length > 0 ? 'sub' : 'dub';
+      
+      // Navigate to watch page
+      window.location.href = `/watch.html?episodeId=${encodeURIComponent(firstEpisode.episodeId)}&server=hd-1&category=${defaultCategory}`;
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to load episode. Please try again.');
+    }
+  });
+</script>
   <script src="/js/main.js"></script>
   <script src="/js/anime.js"></script>
 </body>
