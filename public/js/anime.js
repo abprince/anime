@@ -1,4 +1,5 @@
 // Replace your existing code with this:
+
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const animeId = urlParams.get('id');
