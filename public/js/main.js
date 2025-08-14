@@ -1,8 +1,24 @@
 const API_BASE = '/api/v2/hianime';
 
 async function fetchData(endpoint) {
-  const response = await fetch(`${API_BASE}${endpoint}`);
-  return await response.json();
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message || 'API request unsuccessful');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
 }
 
 function navigateTo(url) {
