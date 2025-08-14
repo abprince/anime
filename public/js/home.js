@@ -6,24 +6,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fetch home data
     const data = await fetchData('/home');
     
-    // Check if data exists and has expected structure
-    if (!data?.data) {
+    // Check if data exists - modified to not use optional chaining
+    if (!data || !data.data) {
       throw new Error('Invalid API response structure');
     }
 
     // Render spotlight
     const spotlightSlider = document.getElementById('spotlight-slider');
     spotlightSlider.innerHTML = '';
-    data.data.spotlightAnimes.forEach(anime => {
-      spotlightSlider.innerHTML += createAnimeCard(anime);
-    });
+    if (data.data.spotlightAnimes) {
+      data.data.spotlightAnimes.forEach(anime => {
+        spotlightSlider.innerHTML += createAnimeCard(anime);
+      });
+    }
 
     // Render latest episodes
     const latestEpisodes = document.getElementById('latest-episodes');
     latestEpisodes.innerHTML = '';
-    data.data.latestEpisodeAnimes.forEach(anime => {
-      latestEpisodes.innerHTML += createAnimeCard(anime);
-    });
+    if (data.data.latestEpisodeAnimes) {
+      data.data.latestEpisodeAnimes.forEach(anime => {
+        latestEpisodes.innerHTML += createAnimeCard(anime);
+      });
+    }
 
     // Add click handlers
     document.querySelectorAll('.anime-card').forEach(card => {
