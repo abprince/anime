@@ -60,6 +60,28 @@ app.basePath(BASE_PATH).get("/anicrush", (c) =>
     c.text("Anicrush could be implemented in future.")
 );
 
+// Add this near your other routes (e.g., after /v or /health)
+app.get("/api/m3u8-proxy", async (c) => {
+  const url = c.req.query("url"); // Extract ?url= parameter
+
+  if (!url) {
+    return c.json({ error: "Missing URL parameter" }, 400);
+  }
+
+  try {
+    const response = await fetch(url);
+    const m3u8Content = await response.text();
+
+    // Return as M3U8 stream with proper headers
+    return c.body(m3u8Content, 200, {
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Access-Control-Allow-Origin": "*",
+    });
+  } catch (error) {
+    return c.json({ error: "Failed to fetch M3U8" }, 500);
+  }
+});
+
 app.notFound(notFoundHandler);
 app.onError(errorHandler);
 
