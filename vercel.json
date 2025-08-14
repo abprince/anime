@@ -1,8 +1,12 @@
 {
-  "rewrites": [
+  "headers": [
     {
-      "source": "(.*)",
-      "destination": "/api"
+      "source": "/api/v2/hianime/proxy-m3u8",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET" },
+        { "key": "Referrer-Policy", "value": "no-referrer-when-downgrade" }
+      ]
     }
   ]
 }
